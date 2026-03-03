@@ -333,8 +333,9 @@ export async function uploadImages(req: NextRequest) {
     return NextResponse.json({ message: 'Images uploaded successfully', urls });
   } catch (err) {
     if (err instanceof AuthError) return NextResponse.json({ message: err.message }, { status: err.status });
-    console.error('uploadImages error:', err);
-    return NextResponse.json({ message: 'Failed to upload images' }, { status: 500 });
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error('uploadImages error:', errMsg, err);
+    return NextResponse.json({ message: 'Failed to upload images', error: errMsg }, { status: 500 });
   }
 }
 

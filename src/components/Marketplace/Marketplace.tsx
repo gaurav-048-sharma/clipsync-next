@@ -95,10 +95,10 @@ const timeAgo = (date: string) => {
  * Compress an image file client-side to avoid Vercel's 4.5 MB body limit.
  * Resizes to max 1200px on the longest side and outputs JPEG at quality 0.8.
  */
-const compressImage = (file: File, maxSize = 1200, quality = 0.8): Promise<File> =>
+const compressImage = (file: File, maxSize = 1200, quality = 0.75): Promise<File> =>
   new Promise((resolve, reject) => {
-    // If it's already small (< 500 KB), skip compression
-    if (file.size < 500 * 1024) { resolve(file); return; }
+    // If already tiny (< 200 KB), skip compression
+    if (file.size < 200 * 1024) { resolve(file); return; }
     const img = new Image();
     const url = URL.createObjectURL(file);
     img.onload = () => {
@@ -469,12 +469,14 @@ function ListingFormModal({
               {CATEGORIES.filter(c => c.value !== 'all').map(cat => (
                 <button
                   key={cat.value}
+                  type="button"
                   onClick={() => setCategory(cat.value)}
                   className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                     category === cat.value
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-gray-100 dark:bg-gray-800 text-theme-color hover:bg-gray-200 dark:hover:bg-gray-700'
+                      ? 'mp-pill-active'
+                      : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'
                   }`}
+                  style={category === cat.value ? { backgroundColor: '#3b82f6', color: '#fff' } : { color: 'var(--text-color)' }}
                 >
                   {cat.icon} {cat.label}
                 </button>
@@ -486,19 +488,28 @@ function ListingFormModal({
           <div>
             <label className="mp-label">Condition</label>
             <div className="flex gap-2 flex-wrap">
-              {CONDITIONS.map(c => (
-                <button
-                  key={c.value}
-                  onClick={() => setCondition(c.value)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                    condition === c.value
-                      ? `${c.color} text-white`
-                      : 'bg-gray-100 dark:bg-gray-800 text-theme-color hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
-                >
-                  {c.label}
-                </button>
-              ))}
+              {CONDITIONS.map(c => {
+                const colorMap: Record<string, string> = {
+                  'bg-emerald-500': '#10b981',
+                  'bg-sky-500': '#0ea5e9',
+                  'bg-amber-500': '#f59e0b',
+                  'bg-orange-500': '#f97316',
+                  'bg-red-500': '#ef4444',
+                };
+                return (
+                  <button
+                    key={c.value}
+                    type="button"
+                    onClick={() => setCondition(c.value)}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                      condition === c.value ? 'mp-pill-active' : 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    }`}
+                    style={condition === c.value ? { backgroundColor: colorMap[c.color] || '#3b82f6', color: '#fff' } : { color: 'var(--text-color)' }}
+                  >
+                    {c.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -802,8 +813,9 @@ const Marketplace = () => {
     for (const file of compressed) {
       const formData = new FormData();
       formData.append('images', file);
+      // Do NOT set Content-Type manually — axios must auto-set the multipart boundary
       const res = await axios.post('/api/marketplace/upload-images', formData, {
-        headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'multipart/form-data' },
+        headers: { Authorization: `Bearer ${getToken()}` },
       });
       if (res.data.urls?.[0]) urls.push(res.data.urls[0]);
     }
@@ -998,12 +1010,14 @@ const Marketplace = () => {
                   {CATEGORIES.map(cat => (
                     <button
                       key={cat.value}
+                      type="button"
                       onClick={() => setFilters(f => ({ ...f, category: cat.value }))}
                       className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                         filters.category === cat.value
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-white dark:bg-gray-800 text-theme-color shadow-sm hover:shadow'
+                          ? 'mp-pill-active'
+                          : 'bg-white dark:bg-gray-800 shadow-sm hover:shadow'
                       }`}
+                      style={filters.category === cat.value ? { backgroundColor: '#3b82f6', color: '#fff' } : { color: 'var(--text-color)' }}
                     >
                       {cat.icon} {cat.label}
                     </button>
