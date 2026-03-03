@@ -5,6 +5,16 @@ import UserProfile from '@/lib/models/userModel';
 import Reel from '@/lib/models/reelModel';
 import '@/lib/models/authModel';
 
+// Helper: find or auto-create a UserProfile for the given authId
+async function ensureProfile(authId: any) {
+  let profile = await UserProfile.findOne({ authId });
+  if (!profile) {
+    profile = new UserProfile({ authId });
+    await profile.save();
+  }
+  return profile;
+}
+
 // ============ SAVED POSTS ============
 
 export async function savePost(req: NextRequest, postId: string) {
@@ -12,12 +22,9 @@ export async function savePost(req: NextRequest, postId: string) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const reel = await Reel.findById(postId);
 
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
     if (!reel) {
       return NextResponse.json({ message: 'Post not found' }, { status: 404 });
     }
@@ -53,11 +60,7 @@ export async function unsavePost(req: NextRequest, postId: string) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
-
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
+    const userProfile = await ensureProfile(user._id);
 
     userProfile.savedPosts = userProfile.savedPosts.filter(
       (id: any) => id.toString() !== postId
@@ -87,6 +90,7 @@ export async function getSavedPosts(req: NextRequest) {
     await dbConnect();
     const user = await verifyAuth(req);
 
+    await ensureProfile(user._id);
     const userProfile = await UserProfile.findOne({ authId: user._id })
       .populate({
         path: 'savedPosts',
@@ -101,11 +105,7 @@ export async function getSavedPosts(req: NextRequest) {
         },
       });
 
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
-
-    const savedPosts = (userProfile.savedPosts || [])
+    const savedPosts = (userProfile!.savedPosts || [])
       .filter((post: any) => post != null)
       .map((post: any) => ({
         _id: post._id,
@@ -138,10 +138,12 @@ export async function getSavedPostIds(req: NextRequest) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    let userProfile = await UserProfile.findOne({ authId: user._id });
 
     if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
+      // Auto-create profile if missing
+      userProfile = new UserProfile({ authId: user._id });
+      await userProfile.save();
     }
 
     const savedPostIds = (userProfile.savedPosts || []).map((id: any) => id.toString());
@@ -160,11 +162,7 @@ export async function isPostSaved(req: NextRequest, postId: string) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
-
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
+    const userProfile = await ensureProfile(user._id);
 
     const isSaved = userProfile.savedPosts.some((id: any) => id.toString() === postId);
     return NextResponse.json({ isSaved });
@@ -184,12 +182,9 @@ export async function archivePost(req: NextRequest, postId: string) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const reel = await Reel.findById(postId);
 
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
     if (!reel) {
       return NextResponse.json({ message: 'Post not found' }, { status: 404 });
     }
@@ -229,12 +224,9 @@ export async function unarchivePost(req: NextRequest, postId: string) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const reel = await Reel.findById(postId);
 
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
     if (!reel) {
       return NextResponse.json({ message: 'Post not found' }, { status: 404 });
     }
@@ -274,11 +266,7 @@ export async function getArchivedPosts(req: NextRequest) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
-
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
+    const userProfile = await ensureProfile(user._id);
 
     const archivedPosts = await Reel.find({
       userId: userProfile._id,
@@ -321,11 +309,7 @@ export async function getActivityLog(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const filter = searchParams.get('filter');
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
-
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
+    const userProfile = await ensureProfile(user._id);
 
     let activities = userProfile.activityLog || [];
 
@@ -416,6 +400,7 @@ export async function getInteractionsSummary(req: NextRequest) {
     await dbConnect();
     const user = await verifyAuth(req);
 
+    await ensureProfile(user._id);
     const userProfile = await UserProfile.findOne({ authId: user._id })
       .populate({
         path: 'likedReels',
@@ -436,11 +421,7 @@ export async function getInteractionsSummary(req: NextRequest) {
         },
       });
 
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
-
-    const myPosts = await Reel.find({ userId: userProfile._id, isArchived: false }).sort({
+    const myPosts = await Reel.find({ userId: userProfile!._id, isArchived: false }).sort({
       created_at: -1,
     });
 
@@ -509,11 +490,7 @@ export async function clearActivityLog(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const filter = searchParams.get('filter');
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
-
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
+    const userProfile = await ensureProfile(user._id);
 
     if (filter && filter !== 'all') {
       userProfile.activityLog = userProfile.activityLog.filter(

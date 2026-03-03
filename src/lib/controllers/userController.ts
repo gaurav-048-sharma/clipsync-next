@@ -13,8 +13,13 @@ export async function getOwnProfile(req: NextRequest) {
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id }).populate('authId', 'username name email college enrollmentId segregation') as any;
-    if (!user) return NextResponse.json({ message: 'Profile not found' }, { status: 404 });
+    let user = await UserProfile.findOne({ authId: authUser._id }).populate('authId', 'username name email college enrollmentId segregation') as any;
+    if (!user) {
+      // Auto-create profile if auth user exists but profile was deleted
+      user = new UserProfile({ authId: authUser._id });
+      await user.save();
+      user = await UserProfile.findOne({ authId: authUser._id }).populate('authId', 'username name email college enrollmentId segregation') as any;
+    }
     
     const auth = await User.findById(authUser._id) as any;
     let department = null;
@@ -34,8 +39,12 @@ export async function getUserProfile(username: string) {
     const auth = await User.findOne({ username }) as any;
     if (!auth) return NextResponse.json({ message: 'User not found' }, { status: 404 });
 
-    const user = await UserProfile.findOne({ authId: auth._id }).populate('authId', 'username name email college enrollmentId segregation');
-    if (!user) return NextResponse.json({ message: 'Profile not found' }, { status: 404 });
+    let user = await UserProfile.findOne({ authId: auth._id }).populate('authId', 'username name email college enrollmentId segregation');
+    if (!user) {
+      user = new UserProfile({ authId: auth._id });
+      await user.save();
+      user = await UserProfile.findOne({ authId: auth._id }).populate('authId', 'username name email college enrollmentId segregation');
+    }
 
     let department = null;
     try { department = auth.enrollmentId ? (User as any).getDepartmentFromEnrollmentId(auth.enrollmentId) : null; } catch {}
@@ -187,9 +196,12 @@ export async function getFollowers(username: string) {
     await dbConnect();
     const auth = await User.findOne({ username });
     if (!auth) return NextResponse.json({ message: 'User not found' }, { status: 404 });
-    const user = await UserProfile.findOne({ authId: auth._id }).populate({ path: 'followers', populate: { path: 'authId', select: 'username name email' }, select: 'authId profilePicture bio' });
-    if (!user) return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    return NextResponse.json({ followers: (user as any).followers });
+    let user = await UserProfile.findOne({ authId: auth._id }).populate({ path: 'followers', populate: { path: 'authId', select: 'username name email' }, select: 'authId profilePicture bio' });
+    if (!user) {
+      user = new UserProfile({ authId: auth._id });
+      await user.save();
+    }
+    return NextResponse.json({ followers: (user as any).followers || [] });
   } catch { return NextResponse.json({ message: 'Server error' }, { status: 500 }); }
 }
 
@@ -199,9 +211,12 @@ export async function getFollowing(username: string) {
     await dbConnect();
     const auth = await User.findOne({ username });
     if (!auth) return NextResponse.json({ message: 'User not found' }, { status: 404 });
-    const user = await UserProfile.findOne({ authId: auth._id }).populate({ path: 'following', populate: { path: 'authId', select: 'username name email' }, select: 'authId profilePicture bio' });
-    if (!user) return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    return NextResponse.json({ following: (user as any).following });
+    let user = await UserProfile.findOne({ authId: auth._id }).populate({ path: 'following', populate: { path: 'authId', select: 'username name email' }, select: 'authId profilePicture bio' });
+    if (!user) {
+      user = new UserProfile({ authId: auth._id });
+      await user.save();
+    }
+    return NextResponse.json({ following: (user as any).following || [] });
   } catch { return NextResponse.json({ message: 'Server error' }, { status: 500 }); }
 }
 
@@ -211,8 +226,12 @@ export async function getUserAnalytics(username: string) {
     await dbConnect();
     const auth = await User.findOne({ username }) as any;
     if (!auth) return NextResponse.json({ message: 'User not found' }, { status: 404 });
-    const user = await UserProfile.findOne({ authId: auth._id }) as any;
-    if (!user) return NextResponse.json({ message: 'Profile not found' }, { status: 404 });
+    let user = await UserProfile.findOne({ authId: auth._id }) as any;
+    if (!user) {
+      user = new UserProfile({ authId: auth._id });
+      await user.save();
+      user = await UserProfile.findOne({ authId: auth._id }) as any;
+    }
 
     const reels = await Reel.find({ userId: user._id }) as any[];
     const totalReels = reels.length;
