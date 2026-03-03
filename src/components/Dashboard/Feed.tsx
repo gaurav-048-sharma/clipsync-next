@@ -150,16 +150,15 @@ const Feed = () => {
 
   const fetchPosts = async () => {
     try {
-      const response = await axios.get('/api/reels', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setPosts(response.data.posts || []);
+      // Parallel fetch: posts + user data at the same time
+      const [postsRes, userRes] = await Promise.all([
+        axios.get('/api/reels', { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get('/api/users/', { headers: { Authorization: `Bearer ${token}` } }),
+      ]);
+      setPosts(postsRes.data.posts || []);
 
-      const userResponse = await axios.get('/api/users/', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
       const liked = new Set<string>(
-        userResponse.data.likedReels?.map((r: string | { toString(): string }) =>
+        userRes.data.likedReels?.map((r: string | { toString(): string }) =>
           typeof r === 'string' ? r : r.toString()
         ) || []
       );
@@ -568,7 +567,32 @@ const Feed = () => {
   if (loading) {
     return (
       <div className="w-full max-w-[470px] px-0 sm:px-4 py-4 sm:py-8">
-        <div className="text-center text-theme-color">Loading posts...</div>
+        <StoryCircles />
+        {/* Skeleton posts */}
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="mb-4 animate-pulse">
+            {/* Header skeleton */}
+            <div className="flex items-center gap-3 px-3 py-3">
+              <div className="w-9 h-9 rounded-full bg-gray-300 dark:bg-gray-700" />
+              <div className="flex-1">
+                <div className="w-28 h-3.5 bg-gray-300 dark:bg-gray-700 rounded" />
+                <div className="w-16 h-2.5 bg-gray-200 dark:bg-gray-800 rounded mt-1.5" />
+              </div>
+            </div>
+            {/* Image skeleton */}
+            <div className="w-full aspect-square bg-gray-200 dark:bg-gray-800" />
+            {/* Actions skeleton */}
+            <div className="flex items-center gap-4 px-3 py-3">
+              <div className="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-800" />
+              <div className="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-800" />
+              <div className="w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-800" />
+              <div className="ml-auto w-7 h-7 rounded-full bg-gray-200 dark:bg-gray-800" />
+            </div>
+            <div className="px-3 pb-3">
+              <div className="w-20 h-3 bg-gray-300 dark:bg-gray-700 rounded" />
+            </div>
+          </div>
+        ))}
       </div>
     );
   }

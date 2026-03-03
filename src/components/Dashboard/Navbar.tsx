@@ -524,9 +524,12 @@ const Navbar = () => {
           <button onClick={() => router.push('/dashboard')} className="flex-1 h-full flex items-center justify-center active:opacity-60 transition-opacity">
             {isActive('/dashboard') ? (
               <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" className="text-theme-color">
+                <path d="M12 2.1L1 12h3v9h6v-6h4v6h6v-9h3L12 2.1z" />
               </svg>
             ) : (
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-theme-color">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-theme-color">
+                <path d="M3 12l9-9 9 9" />
+                <path d="M5 10v10a1 1 0 001 1h3a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1h3a1 1 0 001-1V10" />
               </svg>
             )}
           </button>
