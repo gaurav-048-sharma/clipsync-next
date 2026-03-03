@@ -2,6 +2,12 @@
 const nextConfig = {
   // External packages for server components (moved from experimental in Next.js 15+)
   serverExternalPackages: ['mongoose', 'bcryptjs'],
+  // Increase body size limit for API routes (image uploads)
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '25mb',
+    },
+  },
   // Image domains for S3 and other external sources
   images: {
     remotePatterns: [

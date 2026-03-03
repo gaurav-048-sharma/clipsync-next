@@ -91,6 +91,43 @@ const timeAgo = (date: string) => {
   return new Date(date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
 };
 
+/**
+ * Compress an image file client-side to avoid Vercel's 4.5 MB body limit.
+ * Resizes to max 1200px on the longest side and outputs JPEG at quality 0.8.
+ */
+const compressImage = (file: File, maxSize = 1200, quality = 0.8): Promise<File> =>
+  new Promise((resolve, reject) => {
+    // If it's already small (< 500 KB), skip compression
+    if (file.size < 500 * 1024) { resolve(file); return; }
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      if (width > maxSize || height > maxSize) {
+        const ratio = Math.min(maxSize / width, maxSize / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, width, height);
+      canvas.toBlob(
+        blob => {
+          if (!blob) { resolve(file); return; }
+          const compressed = new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' });
+          resolve(compressed);
+        },
+        'image/jpeg',
+        quality,
+      );
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+
 /* ═══════════════════════════════════════════════════════════════
    IMAGE CAROUSEL — used in detail view
    ═══════════════════════════════════════════════════════════════ */
@@ -758,12 +795,19 @@ const Marketplace = () => {
   /* ── Upload images + create/update ── */
   const uploadImages = async (files: File[]): Promise<string[]> => {
     if (files.length === 0) return [];
-    const formData = new FormData();
-    files.forEach(f => formData.append('images', f));
-    const res = await axios.post('/api/marketplace/upload-images', formData, {
-      headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'multipart/form-data' },
-    });
-    return res.data.urls || [];
+    // Compress all images client-side to stay under Vercel's 4.5 MB body limit
+    const compressed = await Promise.all(files.map(f => compressImage(f)));
+    // Upload one at a time to avoid large payloads
+    const urls: string[] = [];
+    for (const file of compressed) {
+      const formData = new FormData();
+      formData.append('images', file);
+      const res = await axios.post('/api/marketplace/upload-images', formData, {
+        headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'multipart/form-data' },
+      });
+      if (res.data.urls?.[0]) urls.push(res.data.urls[0]);
+    }
+    return urls;
   };
 
   const handleCreate = async (data: any, files: File[]) => {
