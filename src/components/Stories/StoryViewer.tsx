@@ -323,7 +323,11 @@ const StoryViewer = ({
   }, [onClose, goNext, goPrev]);
 
   /* ── Touch gestures ── */
+  const isInteractive = (el: EventTarget | null) =>
+    !!(el instanceof HTMLElement && el.closest('button, input, a, select, textarea, [role="button"], [role="dialog"]'));
+
   const handleTouchStart = (e: React.TouchEvent) => {
+    if (isInteractive(e.target)) { touchStartRef.current = null; return; }
     const t = e.touches[0];
     touchStartRef.current = { x: t.clientX, y: t.clientY, time: Date.now() };
     isLongPressing.current = false;
@@ -343,6 +347,7 @@ const StoryViewer = ({
 
     const start = touchStartRef.current;
     if (!start) return;
+    if (isInteractive(e.target)) { touchStartRef.current = null; return; }
 
     const endX = e.changedTouches[0].clientX;
     const endY = e.changedTouches[0].clientY;
