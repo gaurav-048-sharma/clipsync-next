@@ -293,7 +293,18 @@ export interface IMarketplaceItem extends Document {
   status: 'available' | 'reserved' | 'sold' | 'removed';
   savedBy: Types.ObjectId[];
   views: number;
+  viewedBy: Types.ObjectId[];
   tags: string[];
+  meetupLocations: string[];
+  isVisible: boolean;
+  reportedBy: Array<{ user: Types.ObjectId; reason: string; createdAt: Date }>;
+  reportCount: number;
+  interestedBuyers: Array<{ user: Types.ObjectId; message?: string; offeredPrice?: number; createdAt: Date }>;
+  buyer?: Types.ObjectId;
+  soldAt?: Date;
+  soldPrice?: number;
+  canDeliver: boolean;
+  deliveryCharge: number;
   createdAt: Date;
   updatedAt: Date;
 }
