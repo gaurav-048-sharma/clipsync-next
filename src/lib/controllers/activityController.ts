@@ -4,16 +4,7 @@ import { verifyAuth, AuthError } from '@/lib/middleware/auth';
 import UserProfile from '@/lib/models/userModel';
 import Reel from '@/lib/models/reelModel';
 import '@/lib/models/authModel';
-
-// Helper: find or auto-create a UserProfile for the given authId
-async function ensureProfile(authId: any) {
-  let profile = await UserProfile.findOne({ authId });
-  if (!profile) {
-    profile = new UserProfile({ authId });
-    await profile.save();
-  }
-  return profile;
-}
+import { ensureProfile } from '@/lib/utils/ensureProfile';
 
 // ============ SAVED POSTS ============
 
@@ -138,13 +129,7 @@ export async function getSavedPostIds(req: NextRequest) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    let userProfile = await UserProfile.findOne({ authId: user._id });
-
-    if (!userProfile) {
-      // Auto-create profile if missing
-      userProfile = new UserProfile({ authId: user._id });
-      await userProfile.save();
-    }
+    let userProfile = await ensureProfile(user._id);
 
     const savedPostIds = (userProfile.savedPosts || []).map((id: any) => id.toString());
     return NextResponse.json({ savedPostIds });

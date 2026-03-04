@@ -6,6 +6,7 @@ import User from '@/lib/models/authModel';
 import Notification from '@/lib/models/notificationModel';
 import { verifyAuth, AuthError } from '@/lib/middleware/auth';
 import { parseFormData, uploadFilesToS3 } from '@/lib/utils/upload';
+import { ensureProfile } from '@/lib/utils/ensureProfile';
 
 const STORY_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -17,8 +18,7 @@ export async function createStory(req: NextRequest) {
     const { files, fields } = await parseFormData(req);
     await uploadFilesToS3(files);
 
-    const user = await UserProfile.findOne({ authId: authUser._id });
-    if (!user) return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
+    const user = await ensureProfile(authUser._id);
 
     const file = files.media?.[0] || files.video?.[0];
     if (!file?.location) return NextResponse.json({ message: 'Media file is required' }, { status: 400 });
@@ -47,8 +47,7 @@ export async function getStories(req: NextRequest) {
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id }) as any;
-    if (!user) return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
+    const user = await ensureProfile(authUser._id) as any;
 
     const followingIds = user.following || [];
     const allIds = [...followingIds, user._id];
@@ -154,8 +153,7 @@ export async function viewStory(req: NextRequest, id: string) {
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id });
-    if (!user) return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    const user = await ensureProfile(authUser._id);
 
     const story = await Story.findById(id) as any;
     if (!story) return NextResponse.json({ message: 'Story not found' }, { status: 404 });
@@ -182,8 +180,7 @@ export async function getViewers(req: NextRequest, id: string) {
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id });
-    if (!user) return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    const user = await ensureProfile(authUser._id);
 
     const story = await Story.findById(id)
       .populate({
@@ -228,8 +225,7 @@ export async function likeStory(req: NextRequest, id: string) {
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id });
-    if (!user) return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    const user = await ensureProfile(authUser._id);
 
     const story = await Story.findById(id) as any;
     if (!story) return NextResponse.json({ message: 'Story not found' }, { status: 404 });
@@ -267,8 +263,7 @@ export async function reactToStory(req: NextRequest, id: string) {
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id });
-    if (!user) return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    const user = await ensureProfile(authUser._id);
 
     const { emoji } = await req.json();
     if (!emoji) return NextResponse.json({ message: 'Emoji is required' }, { status: 400 });
@@ -307,8 +302,7 @@ export async function replyToStory(req: NextRequest, id: string) {
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id });
-    if (!user) return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    const user = await ensureProfile(authUser._id);
 
     const { text } = await req.json();
     if (!text?.trim()) return NextResponse.json({ message: 'Reply text is required' }, { status: 400 });
@@ -340,8 +334,7 @@ export async function deleteStory(req: NextRequest, id: string) {
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id });
-    if (!user) return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    const user = await ensureProfile(authUser._id);
 
     const story = await Story.findById(id) as any;
     if (!story) return NextResponse.json({ message: 'Story not found' }, { status: 404 });
@@ -364,8 +357,7 @@ export async function getArchivedStories(req: NextRequest) {
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id });
-    if (!user) return NextResponse.json({ message: 'User not found' }, { status: 404 });
+    const user = await ensureProfile(authUser._id);
 
     const stories = await Story.find({
       userId: user._id,

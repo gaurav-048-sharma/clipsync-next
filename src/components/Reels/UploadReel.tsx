@@ -102,7 +102,6 @@ const UploadReel = () => {
 
       await axios.post('/api/reels', formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${token}`,
         },
         onUploadProgress: (progressEvent) => {

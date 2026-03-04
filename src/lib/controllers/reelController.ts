@@ -6,6 +6,7 @@ import User from '@/lib/models/authModel';
 import Notification from '@/lib/models/notificationModel';
 import { verifyAuth, AuthError } from '@/lib/middleware/auth';
 import { parseFormData, uploadFilesToS3 } from '@/lib/utils/upload';
+import { ensureProfile } from '@/lib/utils/ensureProfile';
 import { getIO } from '@/lib/utils/socket';
 
 export async function createReel(req: NextRequest) {
@@ -17,8 +18,7 @@ export async function createReel(req: NextRequest) {
 
     if (!files.video && !files.media) return NextResponse.json({ message: 'Media file is required' }, { status: 400 });
 
-    const user = await UserProfile.findOne({ authId: authUser._id });
-    if (!user) return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
+    const user = await ensureProfile(authUser._id);
 
     const postData: any = { userId: user._id, caption: fields.caption, views: 0 };
     if (files.video?.[0]) {
@@ -97,7 +97,7 @@ export async function updateReel(req: NextRequest, id: string) {
     const { caption } = await req.json();
     const reel = await Reel.findById(id) as any;
     if (!reel) return NextResponse.json({ message: 'Reel not found' }, { status: 404 });
-    const user = await UserProfile.findOne({ authId: authUser._id });
+    const user = await ensureProfile(authUser._id);
     if (!user || !reel.userId.equals(user._id)) return NextResponse.json({ message: 'Unauthorized' }, { status: 403 });
     if (caption !== undefined) reel.caption = caption;
     reel.updated_at = new Date();
@@ -115,7 +115,7 @@ export async function deleteReel(req: NextRequest, id: string) {
     const authUser = await verifyAuth(req);
     const reel = await Reel.findById(id) as any;
     if (!reel) return NextResponse.json({ message: 'Reel not found' }, { status: 404 });
-    const user = await UserProfile.findOne({ authId: authUser._id });
+    const user = await ensureProfile(authUser._id);
     if (!user || !reel.userId.equals(user._id)) return NextResponse.json({ message: 'Unauthorized' }, { status: 403 });
     await reel.deleteOne();
     return NextResponse.json({ message: 'Reel deleted successfully' });
@@ -129,7 +129,7 @@ export async function likeReel(req: NextRequest, id: string) {
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id }) as any;
+    const user = await ensureProfile(authUser._id) as any;
     const reel = await Reel.findById(id) as any;
     if (!user || !reel) return NextResponse.json({ message: 'User or reel not found' }, { status: 404 });
 
@@ -168,7 +168,7 @@ export async function commentOnReel(req: NextRequest, id: string) {
     await dbConnect();
     const authUser = await verifyAuth(req);
     const { text } = await req.json();
-    const user = await UserProfile.findOne({ authId: authUser._id }) as any;
+    const user = await ensureProfile(authUser._id) as any;
     const reel = await Reel.findById(id) as any;
     if (!user || !reel) return NextResponse.json({ message: 'User or reel not found' }, { status: 404 });
     if (!text || text.length > 1000) return NextResponse.json({ message: 'Comment text is required and must be under 1000 characters' }, { status: 400 });
@@ -203,7 +203,7 @@ export async function replyToComment(req: NextRequest, reelId: string, commentId
     await dbConnect();
     const authUser = await verifyAuth(req);
     const { text } = await req.json();
-    const user = await UserProfile.findOne({ authId: authUser._id }) as any;
+    const user = await ensureProfile(authUser._id) as any;
     const reel = await Reel.findById(reelId) as any;
     if (!user || !reel) return NextResponse.json({ message: 'User or reel not found' }, { status: 404 });
     const comment = reel.comments.id(commentId);
@@ -240,7 +240,7 @@ export async function incrementReelView(req: NextRequest, id: string) {
 
     try {
       const authUser = await verifyAuth(req);
-      const user = await UserProfile.findOne({ authId: authUser._id });
+      const user = await ensureProfile(authUser._id);
       if (user) {
         const alreadyViewed = reel.viewedBy?.some((v: any) => v.userId.toString() === user._id.toString());
         if (!alreadyViewed) {
@@ -264,7 +264,7 @@ export async function saveReel(req: NextRequest, id: string) {
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id }) as any;
+    const user = await ensureProfile(authUser._id) as any;
     const reel = await Reel.findById(id);
     if (!user || !reel) return NextResponse.json({ message: 'User or reel not found' }, { status: 404 });
 
@@ -289,7 +289,7 @@ export async function likeComment(req: NextRequest, reelId: string, commentId: s
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id }) as any;
+    const user = await ensureProfile(authUser._id) as any;
     const reel = await Reel.findById(reelId) as any;
     if (!user || !reel) return NextResponse.json({ message: 'User or reel not found' }, { status: 404 });
 
@@ -315,7 +315,7 @@ export async function deleteComment(req: NextRequest, reelId: string, commentId:
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id }) as any;
+    const user = await ensureProfile(authUser._id) as any;
     const reel = await Reel.findById(reelId) as any;
     if (!user || !reel) return NextResponse.json({ message: 'User or reel not found' }, { status: 404 });
 
@@ -342,7 +342,7 @@ export async function editComment(req: NextRequest, reelId: string, commentId: s
     await dbConnect();
     const authUser = await verifyAuth(req);
     const { text } = await req.json();
-    const user = await UserProfile.findOne({ authId: authUser._id }) as any;
+    const user = await ensureProfile(authUser._id) as any;
     const reel = await Reel.findById(reelId) as any;
     if (!user || !reel) return NextResponse.json({ message: 'User or reel not found' }, { status: 404 });
 
@@ -366,7 +366,7 @@ export async function likeReply(req: NextRequest, reelId: string, commentId: str
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id }) as any;
+    const user = await ensureProfile(authUser._id) as any;
     const reel = await Reel.findById(reelId) as any;
     if (!user || !reel) return NextResponse.json({ message: 'User or reel not found' }, { status: 404 });
 
@@ -395,7 +395,7 @@ export async function deleteReply(req: NextRequest, reelId: string, commentId: s
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const user = await UserProfile.findOne({ authId: authUser._id }) as any;
+    const user = await ensureProfile(authUser._id) as any;
     const reel = await Reel.findById(reelId) as any;
     if (!user || !reel) return NextResponse.json({ message: 'User or reel not found' }, { status: 404 });
 
@@ -424,7 +424,7 @@ export async function editReply(req: NextRequest, reelId: string, commentId: str
     await dbConnect();
     const authUser = await verifyAuth(req);
     const { text } = await req.json();
-    const user = await UserProfile.findOne({ authId: authUser._id }) as any;
+    const user = await ensureProfile(authUser._id) as any;
     const reel = await Reel.findById(reelId) as any;
     if (!user || !reel) return NextResponse.json({ message: 'User or reel not found' }, { status: 404 });
 

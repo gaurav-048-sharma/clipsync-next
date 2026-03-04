@@ -6,6 +6,7 @@ import Reel from '@/lib/models/reelModel';
 import Notification from '@/lib/models/notificationModel';
 import { verifyAuth, AuthError } from '@/lib/middleware/auth';
 import { parseFormData, uploadFilesToS3 } from '@/lib/utils/upload';
+import { ensureProfile } from '@/lib/utils/ensureProfile';
 import { getIO } from '@/lib/utils/socket';
 
 // GET /api/users/me — own profile
@@ -84,8 +85,11 @@ export async function updateUserProfile(req: NextRequest) {
     const { files, fields } = await parseFormData(req);
     await uploadFilesToS3(files);
 
-    const user = await UserProfile.findOne({ authId: authUser._id }) as any;
-    if (!user) return NextResponse.json({ message: 'Profile not found' }, { status: 404 });
+    let user = await UserProfile.findOne({ authId: authUser._id }) as any;
+    if (!user) {
+      user = new UserProfile({ authId: authUser._id });
+      await user.save();
+    }
 
     const auth = await User.findById(authUser._id) as any;
     if (!auth) return NextResponse.json({ message: 'Authentication record not found' }, { status: 404 });
@@ -134,11 +138,10 @@ export async function followUser(req: NextRequest, username: string) {
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const follower = await UserProfile.findOne({ authId: authUser._id }) as any;
+    const follower = await ensureProfile(authUser._id) as any;
     const targetAuth = await User.findOne({ username }) as any;
     if (!targetAuth) return NextResponse.json({ message: 'User not found' }, { status: 404 });
-    const target = await UserProfile.findOne({ authId: targetAuth._id }) as any;
-    if (!target) return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
+    const target = await ensureProfile(targetAuth._id) as any;
     if (follower._id.equals(target._id)) return NextResponse.json({ message: 'Cannot follow yourself' }, { status: 400 });
 
     if (!follower.following.some((id: any) => id.equals(target._id))) {
@@ -172,11 +175,10 @@ export async function unfollowUser(req: NextRequest, username: string) {
   try {
     await dbConnect();
     const authUser = await verifyAuth(req);
-    const follower = await UserProfile.findOne({ authId: authUser._id }) as any;
+    const follower = await ensureProfile(authUser._id) as any;
     const targetAuth = await User.findOne({ username });
     if (!targetAuth) return NextResponse.json({ message: 'User not found' }, { status: 404 });
-    const target = await UserProfile.findOne({ authId: targetAuth._id }) as any;
-    if (!target) return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
+    const target = await ensureProfile(targetAuth._id) as any;
 
     follower.following = follower.following.filter((id: any) => !id.equals(target._id));
     target.followers = target.followers.filter((id: any) => !id.equals(follower._id));

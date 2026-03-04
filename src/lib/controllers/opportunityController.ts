@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/db/mongodb';
 import { verifyAuth, AuthError } from '@/lib/middleware/auth';
 import UserProfile from '@/lib/models/userModel';
+import { ensureProfile } from '@/lib/utils/ensureProfile';
 import {
   InternshipExperience,
   Referral,
@@ -56,10 +57,7 @@ export async function createExperience(req: NextRequest) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
+    const userProfile = await ensureProfile(user._id);
 
     const experience = new InternshipExperience({
       userId: userProfile._id,
@@ -168,7 +166,7 @@ export async function likeExperience(req: NextRequest, id: string) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const experience = await InternshipExperience.findById(id);
 
     if (!experience) {
@@ -199,7 +197,7 @@ export async function commentOnExperience(req: NextRequest, id: string) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const experience = await InternshipExperience.findById(id);
 
     if (!experience) {
@@ -278,10 +276,7 @@ export async function createReferral(req: NextRequest) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
+    const userProfile = await ensureProfile(user._id);
 
     const referral = new Referral({
       userId: userProfile._id,
@@ -353,7 +348,7 @@ export async function applyForReferral(req: NextRequest, id: string) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const referral = await Referral.findById(id);
 
     if (!referral) {
@@ -400,7 +395,7 @@ export async function updateApplicationStatus(
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const referral = await Referral.findById(id);
 
     if (!referral) {
@@ -442,10 +437,7 @@ export async function submitResume(req: NextRequest) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
+    const userProfile = await ensureProfile(user._id);
 
     const resumeReview = new ResumeReview({
       userId: userProfile._id,
@@ -481,7 +473,7 @@ export async function getPendingResumes(req: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
 
     const resumes = await ResumeReview.find({
       currentStatus: status,
@@ -517,7 +509,7 @@ export async function submitReview(req: NextRequest, id: string) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const resumeReview = await ResumeReview.findById(id);
 
     if (!resumeReview) {
@@ -553,7 +545,7 @@ export async function getMyResumeReviews(req: NextRequest) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
 
     const resumes = await ResumeReview.find({ userId: userProfile?._id })
       .populate({
@@ -581,10 +573,7 @@ export async function createPrepGroup(req: NextRequest) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
+    const userProfile = await ensureProfile(user._id);
 
     const group = new PrepGroup({
       ...body,
@@ -720,7 +709,7 @@ export async function joinPrepGroup(req: NextRequest, id: string) {
     const user = await verifyAuth(req);
     const body = await req.json().catch(() => ({}));
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const group = await PrepGroup.findById(id);
 
     if (!group) {
@@ -766,7 +755,7 @@ export async function leavePrepGroup(req: NextRequest, id: string) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const group = await PrepGroup.findById(id);
 
     if (!group) {
@@ -794,7 +783,7 @@ export async function addResource(req: NextRequest, id: string) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const group = await PrepGroup.findById(id);
 
     if (!group) {
@@ -830,7 +819,7 @@ export async function addPrepQuestion(req: NextRequest, id: string) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const group = await PrepGroup.findById(id);
 
     if (!group) {
@@ -863,10 +852,7 @@ export async function scheduleMockInterview(req: NextRequest) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
+    const userProfile = await ensureProfile(user._id);
 
     const mockInterview = new MockInterview({
       ...body,
@@ -894,7 +880,7 @@ export async function getMyMockInterviews(req: NextRequest) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
 
     const interviews = await MockInterview.find({
       $or: [{ interviewer: userProfile?._id }, { interviewee: userProfile?._id }],
@@ -927,7 +913,7 @@ export async function submitMockFeedback(req: NextRequest, id: string) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const interview = await MockInterview.findById(id);
 
     if (!interview) {
@@ -965,7 +951,7 @@ export async function getUserKarma(req: NextRequest) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
 
     let karma = await UserKarma.findOne({ userId: userProfile?._id });
     if (!karma) {

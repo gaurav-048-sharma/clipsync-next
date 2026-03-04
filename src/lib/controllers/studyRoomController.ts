@@ -3,6 +3,7 @@ import dbConnect from '@/lib/db/mongodb';
 import { verifyAuth, AuthError } from '@/lib/middleware/auth';
 import StudyRoom from '@/lib/models/studyRoomModel';
 import UserProfile from '@/lib/models/userModel';
+import { ensureProfile } from '@/lib/utils/ensureProfile';
 import mongoose from 'mongoose';
 
 // ==================== ROOM CRUD ====================
@@ -107,10 +108,7 @@ export async function createRoom(req: NextRequest) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
+    const userProfile = await ensureProfile(user._id);
 
     const room = new StudyRoom({
       ...body,
@@ -161,7 +159,7 @@ export async function updateRoom(req: NextRequest, roomId: string) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const room = await StudyRoom.findById(roomId);
 
     if (!room) {
@@ -194,7 +192,7 @@ export async function deleteRoom(req: NextRequest, roomId: string) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const room = await StudyRoom.findById(roomId);
 
     if (!room) {
@@ -225,7 +223,7 @@ export async function joinRoom(req: NextRequest, roomId: string) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const room = await StudyRoom.findById(roomId);
 
     if (!room) {
@@ -282,7 +280,7 @@ export async function leaveRoom(req: NextRequest, roomId: string) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const room = await StudyRoom.findById(roomId);
 
     if (!room) {
@@ -325,7 +323,7 @@ export async function kickParticipant(req: NextRequest, roomId: string, particip
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const room = await StudyRoom.findById(roomId);
 
     if (!room) {
@@ -366,7 +364,7 @@ export async function startPomodoro(req: NextRequest, roomId: string) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const room = await StudyRoom.findById(roomId);
 
     if (!room) {
@@ -397,7 +395,7 @@ export async function pausePomodoro(req: NextRequest, roomId: string) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const room = await StudyRoom.findById(roomId);
 
     if (!room) {
@@ -430,7 +428,7 @@ export async function resetPomodoro(req: NextRequest, roomId: string) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const room = await StudyRoom.findById(roomId);
 
     if (!room) {
@@ -463,7 +461,7 @@ export async function togglePomodoroState(req: NextRequest, roomId: string) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const room = await StudyRoom.findById(roomId);
 
     if (!room) {
@@ -531,7 +529,7 @@ export async function updatePomodoroSettings(req: NextRequest, roomId: string) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const room = await StudyRoom.findById(roomId);
 
     if (!room) {
@@ -567,7 +565,7 @@ export async function sendChatMessage(req: NextRequest, roomId: string) {
     const user = await verifyAuth(req);
     const body = await req.json();
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
+    const userProfile = await ensureProfile(user._id);
     const room = await StudyRoom.findById(roomId);
 
     if (!room) {
@@ -639,10 +637,7 @@ export async function getMyStats(req: NextRequest) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
+    const userProfile = await ensureProfile(user._id);
 
     const rooms = await StudyRoom.find({
       'participants.userId': userProfile._id,
@@ -744,10 +739,7 @@ export async function getMyRooms(req: NextRequest) {
     await dbConnect();
     const user = await verifyAuth(req);
 
-    const userProfile = await UserProfile.findOne({ authId: user._id });
-    if (!userProfile) {
-      return NextResponse.json({ message: 'User profile not found' }, { status: 404 });
-    }
+    const userProfile = await ensureProfile(user._id);
 
     const rooms = await StudyRoom.find({
       $or: [
