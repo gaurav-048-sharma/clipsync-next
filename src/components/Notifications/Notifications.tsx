@@ -82,7 +82,7 @@ const Notifications = () => {
     try {
       const token = getToken();
       await axios.put(
-        `/api/notifications/${notificationId}/read`,
+        `/api/notifications/${notificationId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -100,7 +100,7 @@ const Notifications = () => {
     try {
       const token = getToken();
       await axios.put(
-        '/api/notifications/read-all',
+        '/api/notifications',
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

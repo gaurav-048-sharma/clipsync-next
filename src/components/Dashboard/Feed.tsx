@@ -647,7 +647,7 @@ const Feed = () => {
                   >
                     <div className="w-full h-full rounded-full flex items-center justify-center overflow-hidden bg-theme-background">
                       {post.userId?.profilePicture &&
-                      post.userId.profilePicture !== 'default-profile-pic.jpg' &&
+                      post.userId.profilePicture !== '/default-avatar.svg' &&
                       post.userId.profilePicture.startsWith('http') ? (
                         <img src={post.userId.profilePicture} alt="Profile" className="w-full h-full object-cover" />
                       ) : (
@@ -808,7 +808,7 @@ const Feed = () => {
                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-pink-500 p-[1.5px]">
                   <div className="w-full h-full rounded-full flex items-center justify-center overflow-hidden bg-theme-background">
                     {selectedPost.userId?.profilePicture &&
-                    selectedPost.userId.profilePicture !== 'default-profile-pic.jpg' &&
+                    selectedPost.userId.profilePicture !== '/default-avatar.svg' &&
                     selectedPost.userId.profilePicture.startsWith('http') ? (
                       <img src={selectedPost.userId.profilePicture} alt="Profile" className="w-full h-full object-cover" />
                     ) : (
@@ -836,7 +836,7 @@ const Feed = () => {
                     <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-pink-500 p-[1.5px] flex-shrink-0">
                       <div className="w-full h-full rounded-full flex items-center justify-center overflow-hidden bg-theme-background">
                         {selectedPost.userId?.profilePicture &&
-                        selectedPost.userId.profilePicture !== 'default-profile-pic.jpg' &&
+                        selectedPost.userId.profilePicture !== '/default-avatar.svg' &&
                         selectedPost.userId.profilePicture.startsWith('http') ? (
                           <img src={selectedPost.userId.profilePicture} alt="Profile" className="w-full h-full object-cover" />
                         ) : (
@@ -869,7 +869,7 @@ const Feed = () => {
                         >
                           <div className="w-full h-full rounded-full flex items-center justify-center overflow-hidden bg-theme-background">
                             {comment.userId?.profilePicture &&
-                            comment.userId.profilePicture !== 'default-profile-pic.jpg' &&
+                            comment.userId.profilePicture !== '/default-avatar.svg' &&
                             comment.userId.profilePicture.startsWith('http') ? (
                               <img src={comment.userId.profilePicture} alt="Profile" className="w-full h-full object-cover" />
                             ) : (
@@ -982,7 +982,7 @@ const Feed = () => {
                             >
                               <div className="w-full h-full rounded-full flex items-center justify-center overflow-hidden bg-theme-background">
                                 {reply.userId?.profilePicture &&
-                                reply.userId.profilePicture !== 'default-profile-pic.jpg' &&
+                                reply.userId.profilePicture !== '/default-avatar.svg' &&
                                 reply.userId.profilePicture.startsWith('http') ? (
                                   <img src={reply.userId.profilePicture} alt="Profile" className="w-full h-full object-cover" />
                                 ) : (

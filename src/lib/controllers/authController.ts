@@ -233,7 +233,7 @@ export async function searchUsers(req: NextRequest) {
       const dept = user.enrollmentId ? (User as any).getDepartmentFromEnrollmentId(user.enrollmentId) : null;
       return {
         _id: user._id, username: user.username, name: user.name || '', email: user.email,
-        profilePicture: profile.profilePicture || 'default-profile-pic.jpg', bio: profile.bio || '',
+        profilePicture: profile.profilePicture || '/default-avatar.svg', bio: profile.bio || '',
         college: user.college || null, department: dept, year: user.segregation?.year || null, enrollmentId: user.enrollmentId || null,
       };
     });

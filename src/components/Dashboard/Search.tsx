@@ -401,7 +401,7 @@ const Search = ({ onClose }: SearchProps) => {
                   <img
                     src={
                       user.profilePicture &&
-                      user.profilePicture !== 'default-profile-pic.jpg'
+                      user.profilePicture !== '/default-avatar.svg'
                         ? user.profilePicture
                         : 'https://via.placeholder.com/40'
                     }

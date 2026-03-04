@@ -98,7 +98,7 @@ const EditProfile = ({ onClose, onSave, initialData, token }: EditProfileProps) 
   };
 
   const hasValidCurrentPicture = initialData?.profilePicture && 
-    initialData.profilePicture !== 'default-profile-pic.jpg' && 
+    initialData.profilePicture !== '/default-avatar.svg' && 
     initialData.profilePicture.startsWith('http');
 
   return (

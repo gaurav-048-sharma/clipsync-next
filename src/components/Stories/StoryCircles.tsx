@@ -77,7 +77,7 @@ const StoryCircles = () => {
   };
 
   const hasValidPic = (url?: string) =>
-    url && url !== 'default-profile-pic.jpg' && url.startsWith('http');
+    url && url !== '/default-avatar.svg' && url.startsWith('http');
 
   const renderAvatar = (url: string | undefined, letter: string, size: string) => {
     if (hasValidPic(url)) {

@@ -176,7 +176,7 @@ const Profile = () => {
             <div className="flex-shrink-0">
               <div className="w-[77px] h-[77px] sm:w-20 sm:h-20 md:w-[150px] md:h-[150px] rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-pink-500 p-[2px]">
                 <div className="w-full h-full rounded-full p-[2px] sm:p-[3px] bg-theme-background">
-                  {profile.profilePicture && profile.profilePicture !== 'default-profile-pic.jpg' && profile.profilePicture.startsWith('http') ? (
+                  {profile.profilePicture && profile.profilePicture !== '/default-avatar.svg' && profile.profilePicture.startsWith('http') ? (
                     <img
                       src={profile.profilePicture}
                       alt="Profile"
@@ -191,7 +191,7 @@ const Profile = () => {
                   <div 
                     className="w-full h-full rounded-full flex items-center justify-center bg-gradient-avatar"
                     style={{ 
-                      display: profile.profilePicture && profile.profilePicture !== 'default-profile-pic.jpg' && profile.profilePicture.startsWith('http') ? 'none' : 'flex'
+                      display: profile.profilePicture && profile.profilePicture !== '/default-avatar.svg' && profile.profilePicture.startsWith('http') ? 'none' : 'flex'
                     }}
                   >
                     <span className="text-xl sm:text-2xl md:text-5xl font-semibold text-white">

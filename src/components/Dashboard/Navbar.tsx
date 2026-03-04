@@ -406,7 +406,7 @@ const Navbar = () => {
                 <div className="flex items-center gap-3 flex-1" onClick={() => handleUserClick(user.username || '')}>
                   <img
                     src={
-                      user.profilePicture && user.profilePicture !== 'default-profile-pic.jpg'
+                      user.profilePicture && user.profilePicture !== '/default-avatar.svg'
                         ? user.profilePicture
                         : 'https://via.placeholder.com/44'
                     }

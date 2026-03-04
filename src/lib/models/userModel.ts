@@ -15,7 +15,7 @@ const userProfileSchema = new Schema<IUserProfile>({
   },
   profilePicture: {
     type: String,
-    default: 'default-profile-pic.jpg',
+    default: '/default-avatar.svg',
   },
   followers: [{ type: Schema.Types.ObjectId, ref: 'UserProfile' }],
   following: [{ type: Schema.Types.ObjectId, ref: 'UserProfile' }],

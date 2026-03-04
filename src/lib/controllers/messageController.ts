@@ -86,7 +86,7 @@ export async function getConversations(req: NextRequest) {
         _id: conv._id,
         username: userMap[conv._id.toString()]?.username || 'Unknown',
         name: userMap[conv._id.toString()]?.name || 'Unknown',
-        profilePicture: profileMap[conv._id.toString()]?.profilePicture || 'default-profile-pic.jpg',
+        profilePicture: profileMap[conv._id.toString()]?.profilePicture || '/default-avatar.svg',
       },
       lastMessage: { content: conv.lastMessage.content, timestamp: conv.lastMessage.timestamp, status: conv.lastMessage.status, messageType: conv.lastMessage.messageType },
       unreadCount: conv.unreadCount,
@@ -156,9 +156,9 @@ export async function deleteMessage(req: NextRequest, messageId: string) {
     const message = await Message.findById(messageId) as any;
     if (!message) return NextResponse.json({ message: 'Message not found' }, { status: 404 });
     if (message.sender.toString() !== authUser._id) return NextResponse.json({ message: 'Unauthorized' }, { status: 403 });
-    if (!message.deletedFor) message.deletedFor = [];
-    message.deletedFor.push(authUser._id);
-    await message.save();
+
+    // Delete for everyone — remove the document entirely
+    await Message.findByIdAndDelete(messageId);
     return NextResponse.json({ message: 'Message deleted' });
   } catch (err) {
     if (err instanceof AuthError) return NextResponse.json({ message: err.message }, { status: err.status });
