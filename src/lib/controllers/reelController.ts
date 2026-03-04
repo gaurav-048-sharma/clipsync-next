@@ -70,7 +70,10 @@ export async function getAllPosts(req: NextRequest) {
 
     const total = await Reel.countDocuments({ userId: { $ne: null } });
     return NextResponse.json({ posts, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
-  } catch { return NextResponse.json({ message: 'Server error' }, { status: 500 }); }
+  } catch (err) {
+    console.error('getAllPosts error:', err);
+    return NextResponse.json({ message: 'Server error', error: err instanceof Error ? err.message : String(err) }, { status: 500 });
+  }
 }
 
 export async function getUserReels(username: string) {

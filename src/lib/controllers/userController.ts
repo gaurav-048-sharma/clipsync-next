@@ -114,7 +114,8 @@ export async function updateUserProfile(req: NextRequest) {
     return NextResponse.json({ message: 'Profile updated successfully', user: populated });
   } catch (err) {
     if (err instanceof AuthError) return NextResponse.json({ message: err.message }, { status: err.status });
-    return NextResponse.json({ message: 'Server error' }, { status: 500 });
+    console.error('updateUserProfile error:', err);
+    return NextResponse.json({ message: 'Server error', error: err instanceof Error ? err.message : String(err) }, { status: 500 });
   }
 }
 
