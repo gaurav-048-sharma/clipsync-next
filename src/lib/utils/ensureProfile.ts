@@ -9,8 +9,17 @@ export async function ensureProfile(authId: any) {
   await dbConnect();
   let profile = await UserProfile.findOne({ authId });
   if (!profile) {
-    profile = new UserProfile({ authId });
-    await profile.save();
+    try {
+      profile = new UserProfile({ authId });
+      await profile.save();
+    } catch (err: any) {
+      // Handle race condition: another request may have created it
+      if (err.code === 11000) {
+        profile = await UserProfile.findOne({ authId });
+      } else {
+        throw err;
+      }
+    }
   }
   return profile;
 }
