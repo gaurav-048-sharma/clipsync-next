@@ -1,11 +1,17 @@
 import { S3Client, PutObjectCommand, ListBucketsCommand } from '@aws-sdk/client-s3';
 import path from 'path';
 
+/* .trim() all env vars — Vercel can carry trailing \r\n from copy-paste */
+const awsRegion   = (process.env.AWS_REGION || 'ap-south-1').trim();
+const awsKey      = (process.env.AWS_ACCESS_KEY_ID || '').trim();
+const awsSecret   = (process.env.AWS_SECRET_ACCESS_KEY || '').trim();
+const bucketName  = (process.env.S3_BUCKET_NAME || '').trim();
+
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION || 'ap-south-1',
+  region: awsRegion,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: awsKey,
+    secretAccessKey: awsSecret,
   },
 });
 
@@ -19,8 +25,7 @@ export async function uploadToS3(
   folder: string
 ): Promise<string> {
   const key = `${folder}/${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(originalName)}`;
-  const bucketName = process.env.S3_BUCKET_NAME!;
-  const region = process.env.AWS_REGION || 'ap-south-1';
+  const region = awsRegion;
 
   const command = new PutObjectCommand({
     Bucket: bucketName,
