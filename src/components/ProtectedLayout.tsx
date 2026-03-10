@@ -3,6 +3,15 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+}
+
 export default function ProtectedLayout({
   children,
 }: {
@@ -13,11 +22,26 @@ export default function ProtectedLayout({
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (!token) {
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('msalToken');
       router.replace('/login');
     } else {
       setIsAuthenticated(true);
     }
+  }, [router]);
+
+  // Periodically check token expiry (every 60 seconds)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const token = localStorage.getItem('token');
+      if (!token || isTokenExpired(token)) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('msalToken');
+        router.replace('/login');
+      }
+    }, 60_000);
+    return () => clearInterval(interval);
   }, [router]);
 
   if (isAuthenticated === null) {

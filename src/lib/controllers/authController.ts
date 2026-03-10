@@ -57,7 +57,7 @@ export async function login(req: NextRequest) {
     const isMatch = await bcrypt.compare(password, (user as any).password);
     if (!isMatch) return NextResponse.json({ message: 'Incorrect password' }, { status: 400 });
 
-    const token = jwt.sign({ id: user._id, email: (user as any).email }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user._id, email: (user as any).email }, process.env.JWT_SECRET!, { expiresIn: '7d' });
     return NextResponse.json({ message: 'Login successful', token, segregation: (user as any).segregation });
   } catch (err: any) {
     return NextResponse.json({ error: 'An error occurred during login' }, { status: 500 });
@@ -101,7 +101,7 @@ export async function googleLogin(req: NextRequest) {
       if (needsUpdate) await auth.save();
     }
 
-    const tokenJwt = jwt.sign({ id: auth._id, email }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+    const tokenJwt = jwt.sign({ id: auth._id, email }, process.env.JWT_SECRET!, { expiresIn: '7d' });
     const department = (auth as any).enrollmentId ? (User as any).getDepartmentFromEnrollmentId((auth as any).enrollmentId) : null;
 
     return NextResponse.json({ token: tokenJwt, college: (auth as any).college, enrollmentId: (auth as any).enrollmentId, department });
@@ -153,7 +153,7 @@ export async function microsoftLogin(req: NextRequest) {
       if (needsUpdate) await auth.save();
     }
 
-    const tokenJwt = jwt.sign({ id: auth._id, email }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+    const tokenJwt = jwt.sign({ id: auth._id, email }, process.env.JWT_SECRET!, { expiresIn: '7d' });
     const department = (auth as any).enrollmentId ? (User as any).getDepartmentFromEnrollmentId((auth as any).enrollmentId) : null;
 
     return NextResponse.json({ token: tokenJwt, segregation: (auth as any).segregation, college: (auth as any).college, enrollmentId: (auth as any).enrollmentId, department });

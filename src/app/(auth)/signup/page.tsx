@@ -1,7 +1,12 @@
 'use client';
 
-import Signup from '@/components/Auth/Signup';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function SignupPage() {
-  return <Signup />;
+  const router = useRouter();
+  useEffect(() => {
+    router.replace('/login');
+  }, [router]);
+  return null;
 }

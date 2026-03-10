@@ -2,55 +2,19 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import { getMsalInstance } from '@/lib/config/msalConfig';
 import axios from 'axios';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { BsMicrosoft } from 'react-icons/bs';
 
 const Login = () => {
   const [error, setError] = useState('');
-  const [isMsalInitialized, setIsMsalInitialized] = useState(true);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const msalInstance = getMsalInstance();
 
-  // MSAL is already initialized by AuthProvider before this component renders.
-  // No need to call initialize() again.
-
-  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
-    try {
-      const response = await axios.post('/api/auth/google-login', {
-        token: credentialResponse.credential,
-      });
-      localStorage.setItem('token', response.data.token);
-      if (response.data.college) {
-        localStorage.setItem('college', JSON.stringify(response.data.college));
-      }
-      if (response.data.enrollmentId) {
-        localStorage.setItem('enrollmentId', response.data.enrollmentId);
-      }
-      if (response.data.department) {
-        localStorage.setItem('department', response.data.department);
-      }
-      router.push('/dashboard');
-    } catch (err: any) {
-      console.error('Google Login error:', err);
-      const errorMessage = err.response?.data?.message || 'Google Login failed';
-      const hint = err.response?.data?.hint || '';
-      setError(hint ? `${errorMessage}. ${hint}` : errorMessage);
-    }
-  };
-
-  const handleGoogleError = () => {
-    setError('Google Login failed');
-  };
-
   const handleMicrosoftLogin = async () => {
-    if (!isMsalInitialized) {
-      setError('Authentication not yet initialized. Please wait.');
-      return;
-    }
+    setError('');
+    setLoading(true);
     const loginRequest = {
       scopes: ['User.Read'],
       prompt: 'select_account' as const,
@@ -80,102 +44,57 @@ const Login = () => {
       const errorMessage = err.response?.data?.message || 'Microsoft Login failed';
       const hint = err.response?.data?.hint || '';
       setError(hint ? `${errorMessage}. ${hint}` : errorMessage);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div
-      className="flex items-center justify-center min-h-screen p-3 sm:p-4 bg-theme-background"
-    >
-      <div className="w-full max-w-sm">
-        {/* Logo Section */}
-        <div className="text-center mb-6 sm:mb-8">
+    <div className="flex items-center justify-center min-h-screen p-4 bg-theme-background">
+      <div className="w-full max-w-[350px]">
+        {/* Logo & branding */}
+        <div className="text-center mb-8">
           <img
             src="/logo.svg"
             alt="ClipSync"
-            className="w-20 h-20 sm:w-24 sm:h-24 mx-auto mb-3 sm:mb-4 rounded-full"
+            className="w-16 h-16 mx-auto mb-4 rounded-full"
           />
-          <h1
-            className="text-3xl sm:text-4xl font-light mb-2 text-theme-color font-cursive"
-          >
+          <h1 className="text-2xl font-semibold tracking-tight text-theme-color">
             ClipSync
           </h1>
-          <p
-            className="text-xs sm:text-sm px-4 text-theme-color opacity-60"
-          >
-            Sign in to see photos and videos from your friends
+          <p className="text-sm mt-1 text-theme-color opacity-50">
+            Your college community
           </p>
         </div>
 
-        {/* Login Card */}
-        <Card
-          className="border rounded-sm bg-theme-background border-theme-color"
-        >
-          <CardContent className="p-6 sm:p-10 space-y-4 sm:space-y-5">
-            <div className="flex flex-col space-y-3">
-              <div className="w-full">
-                <GoogleLogin
-                  onSuccess={handleGoogleSuccess}
-                  onError={handleGoogleError}
-                  text="signin_with"
-                  shape="rectangular"
-                  size="large"
-                  width="100%"
-                />
-              </div>
+        {/* Login card */}
+        <div className="border rounded-lg p-8 bg-theme-background border-theme-color">
+          <p className="text-center text-sm text-theme-color opacity-70 mb-6">
+            Sign in with your college Microsoft account
+          </p>
 
-              <div className="flex items-center gap-4 my-4">
-                <div
-                  className="flex-1 h-px bg-border-color"
-                />
-                <span
-                  className="text-xs font-semibold text-theme-color opacity-40"
-                >
-                  OR
-                </span>
-                <div
-                  className="flex-1 h-px bg-border-color"
-                />
-              </div>
+          <button
+            onClick={handleMicrosoftLogin}
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-3 py-3 px-4 rounded-md font-medium text-sm transition-colors bg-[#2f2f2f] text-white hover:bg-[#404040] disabled:opacity-50 disabled:cursor-not-allowed dark:bg-[#f3f3f3] dark:text-[#1a1a1a] dark:hover:bg-[#e0e0e0]"
+          >
+            <BsMicrosoft className="w-4 h-4 flex-shrink-0" />
+            {loading ? 'Signing in...' : 'Sign in with Microsoft'}
+          </button>
 
-              <Button
-                onClick={handleMicrosoftLogin}
-                disabled={!isMsalInitialized}
-                className="w-full flex items-center justify-center gap-2 sm:gap-3 py-5 sm:py-6 rounded-lg transition-all active:scale-[0.98] auth-ms-button"
-              >
-                <BsMicrosoft className="w-4 h-4 sm:w-5 sm:h-5" />
-                <span className="font-medium text-sm sm:text-base">
-                  Sign in with Microsoft
-                </span>
-              </Button>
+          {error && (
+            <div className="mt-4 p-3 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+              <p className="text-red-600 dark:text-red-400 text-xs text-center">
+                {error}
+              </p>
             </div>
+          )}
+        </div>
 
-            {error && (
-              <div className="mt-4 p-2.5 sm:p-3 rounded-md bg-red-50 border border-red-200">
-                <p className="text-red-600 text-xs sm:text-sm text-center">
-                  {error}
-                </p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Sign Up Card */}
-        <Card
-          className="mt-3 border rounded-sm bg-theme-background border-theme-color"
-        >
-          <CardContent className="p-4 sm:p-6 text-center">
-            <p className="text-xs sm:text-sm text-theme-color">
-              Don&apos;t have an account?{' '}
-              <span
-                onClick={() => router.push('/signup')}
-                className="font-semibold text-blue-500 hover:text-blue-700 cursor-pointer active:opacity-70"
-              >
-                Sign up
-              </span>
-            </p>
-          </CardContent>
-        </Card>
+        {/* Footer */}
+        <p className="text-center text-xs text-theme-color opacity-40 mt-6">
+          Only registered college emails are supported
+        </p>
       </div>
     </div>
   );

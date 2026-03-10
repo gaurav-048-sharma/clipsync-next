@@ -1,6 +1,7 @@
 'use client';
 
-import { GoogleOAuthProvider } from '@react-oauth/google';
+// Google OAuth disabled — authentication is Microsoft-only
+// import { GoogleOAuthProvider } from '@react-oauth/google';
 import { MsalProvider } from '@azure/msal-react';
 import { getMsalInstance } from '@/lib/config/msalConfig';
 import { useEffect, useState } from 'react';
@@ -16,14 +17,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [msalInstance]);
 
   if (!msalReady) {
-    return null; // Or a loading spinner
+    return null;
   }
 
   return (
-    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ''}>
-      <MsalProvider instance={msalInstance}>
-        {children}
-      </MsalProvider>
-    </GoogleOAuthProvider>
+    <MsalProvider instance={msalInstance}>
+      {children}
+    </MsalProvider>
   );
 }
