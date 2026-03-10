@@ -720,7 +720,7 @@ const InstagramMessages = () => {
         {/* ───── Chat Window ───── */}
         {selectedConversation ? (
           <div
-            className={`flex-1 flex flex-col absolute md:relative inset-0 md:inset-auto transition-transform duration-300 ease-in-out bg-theme-background h-full max-h-screen overflow-hidden z-20 ${
+            className={`flex-1 flex flex-col fixed md:relative inset-0 md:inset-auto h-[100dvh] md:h-full bg-theme-background overflow-hidden z-20 ${
               selectedConversation
                 ? 'translate-x-0'
                 : 'translate-x-full md:translate-x-0'
@@ -728,7 +728,7 @@ const InstagramMessages = () => {
           >
             {/* Chat Header */}
             <div
-              className="sticky top-0 z-30 bg-theme-background"
+              className="flex-shrink-0 z-30 bg-theme-background"
             >
               <ChatHeader
                 username={selectedConversation.username}
@@ -904,7 +904,7 @@ const InstagramMessages = () => {
 
             {/* Message Input */}
             <div
-              className="sticky bottom-0 left-0 right-0 px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 pb-16 md:pb-4 border-t border-theme-color bg-theme-background flex-shrink-0 z-10"
+              className="flex-shrink-0 px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 border-t border-theme-color bg-theme-background z-10"
             >
               <MessageInput onSend={handleSendMessage} />
             </div>

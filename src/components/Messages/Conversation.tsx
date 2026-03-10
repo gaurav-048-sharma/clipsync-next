@@ -3,7 +3,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Navbar from '../Dashboard/Navbar';
 import MessageInput from './MessageInput';
 
@@ -129,58 +128,56 @@ const Conversation = () => {
 
   return (
     <div
-      className="min-h-screen flex flex-col md:flex-row bg-theme-background"
+      className="h-screen flex flex-col md:flex-row overflow-hidden bg-theme-background"
     >
       <Navbar />
-      <div className="w-full md:w-4/5 md:ml-64 p-4 flex flex-col">
-        <Card className="w-full max-w-4xl mx-auto shadow-lg flex-1 flex flex-col">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl md:text-3xl font-bold">
-              Chat with {recipientUsername}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex-1 flex flex-col space-y-4 overflow-y-auto max-h-[70vh]">
-            {messages.length === 0 ? (
-              <p
-                className="text-center text-theme-color-60"
+      <div className="flex-1 md:ml-64 flex flex-col h-full overflow-hidden">
+        <div className="flex-shrink-0 text-center py-3 border-b border-theme-color bg-theme-background">
+          <h2 className="text-lg md:text-xl font-bold text-theme-color">
+            Chat with {recipientUsername}
+          </h2>
+        </div>
+        <div className="flex-1 overflow-y-auto min-h-0 px-4 py-3 space-y-4">
+          {messages.length === 0 ? (
+            <p
+              className="text-center text-theme-color-60"
+            >
+              No messages yet
+            </p>
+          ) : (
+            messages.map((msg) => (
+              <div
+                key={msg._id}
+                className={`p-2 rounded-lg max-w-xs ${
+                  msg.recipient._id === currentUserId
+                    ? 'bg-gray-200 dark:bg-gray-700 self-start'
+                    : 'bg-blue-500 text-white self-end'
+                }`}
               >
-                No messages yet
-              </p>
-            ) : (
-              messages.map((msg) => (
-                <div
-                  key={msg._id}
-                  className={`p-2 rounded-lg max-w-xs ${
-                    msg.recipient._id === currentUserId
-                      ? 'bg-gray-200 dark:bg-gray-700 self-start'
-                      : 'bg-blue-500 text-white self-end'
+                <p>{msg.content}</p>
+                <p
+                  className={`text-xs ${
+                    msg.sender._id === currentUserId
+                      ? 'text-gray-200'
+                      : 'text-black dark:text-gray-300'
                   }`}
                 >
-                  <p>{msg.content}</p>
-                  <p
-                    className={`text-xs ${
-                      msg.sender._id === currentUserId
-                        ? 'text-gray-200'
-                        : 'text-black dark:text-gray-300'
-                    }`}
-                  >
-                    {new Date(
-                      msg.timestamp || msg.createdAt || ''
-                    ).toLocaleTimeString([], {
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    })}
-                  </p>
-                </div>
-              ))
-            )}
-          </CardContent>
-          <div
-            className="p-4 border-t border-theme-color"
-          >
-            <MessageInput onSend={handleSendMessage} />
-          </div>
-        </Card>
+                  {new Date(
+                    msg.timestamp || msg.createdAt || ''
+                  ).toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </p>
+              </div>
+            ))
+          )}
+        </div>
+        <div
+          className="flex-shrink-0 p-4 border-t border-theme-color bg-theme-background"
+        >
+          <MessageInput onSend={handleSendMessage} />
+        </div>
       </div>
     </div>
   );
