@@ -720,7 +720,7 @@ const InstagramMessages = () => {
         {/* ───── Chat Window ───── */}
         {selectedConversation ? (
           <div
-            className={`flex-1 flex flex-col fixed md:relative inset-0 md:inset-auto h-[100dvh] md:h-full bg-theme-background overflow-hidden z-20 ${
+            className={`flex flex-col fixed md:relative inset-0 md:inset-auto md:flex-1 md:h-full bg-theme-background overflow-hidden z-[60] ${
               selectedConversation
                 ? 'translate-x-0'
                 : 'translate-x-full md:translate-x-0'
@@ -821,6 +821,7 @@ const InstagramMessages = () => {
             <div
               ref={messagesContainerRef}
               className="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-4 md:px-6 py-3 sm:py-4 min-h-0"
+              style={{ WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }}
             >
               {messages.length === 0 ? (
                 <p
