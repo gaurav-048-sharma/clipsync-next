@@ -720,7 +720,7 @@ const InstagramMessages = () => {
         {/* ───── Chat Window ───── */}
         {selectedConversation ? (
           <div
-            className={`flex flex-col absolute md:relative inset-0 md:inset-auto md:flex-1 md:h-full bg-theme-background overflow-hidden z-[60]`}
+            className="flex flex-col fixed md:relative inset-0 md:inset-auto md:flex-1 md:h-full bg-theme-background overflow-hidden z-[60]"
           >
             {/* Chat Header */}
             <div
