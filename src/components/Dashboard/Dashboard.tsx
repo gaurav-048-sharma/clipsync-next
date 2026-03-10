@@ -134,12 +134,7 @@ const Dashboard = () => {
             <div className="flex gap-2 overflow-x-auto scrollbar-hide">
               <PrefetchLink
                 to="/events"
-                className="relative flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:scale-105 active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white',
-                  boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
-                }}
+                className="relative flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:opacity-80 active:scale-95 bg-black text-white dark:bg-white dark:text-black"
               >
                 <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 <span>Events</span>
@@ -147,12 +142,7 @@ const Dashboard = () => {
 
               <PrefetchLink
                 to="/marketplace"
-                className="relative flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:scale-105 active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                  color: 'white',
-                  boxShadow: '0 2px 8px rgba(245, 87, 108, 0.3)',
-                }}
+                className="relative flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:opacity-80 active:scale-95 bg-black text-white dark:bg-white dark:text-black"
               >
                 <ShoppingBag className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 <span>Marketplace</span>
@@ -160,12 +150,7 @@ const Dashboard = () => {
 
               <PrefetchLink
                 to="/confessions"
-                className="relative flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:scale-105 active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-                  color: 'white',
-                  boxShadow: '0 2px 8px rgba(79, 172, 254, 0.3)',
-                }}
+                className="relative flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:opacity-80 active:scale-95 bg-black text-white dark:bg-white dark:text-black"
               >
                 <MessageSquare className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 <span>Confessions</span>
@@ -173,12 +158,7 @@ const Dashboard = () => {
 
               <button
                 onClick={() => router.push('/upload-story')}
-                className="flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:scale-105 active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-                  color: 'white',
-                  boxShadow: '0 2px 8px rgba(250, 112, 154, 0.3)',
-                }}
+                className="flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:opacity-80 active:scale-95 bg-black text-white dark:bg-white dark:text-black"
               >
                 <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 <span>Add Story</span>
@@ -186,12 +166,7 @@ const Dashboard = () => {
 
               <PrefetchLink
                 to="/opportunities"
-                className="relative flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:scale-105 active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
-                  color: 'white',
-                  boxShadow: '0 2px 8px rgba(17, 153, 142, 0.3)',
-                }}
+                className="relative flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:opacity-80 active:scale-95 bg-black text-white dark:bg-white dark:text-black"
               >
                 <Briefcase className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 <span>Opportunities</span>

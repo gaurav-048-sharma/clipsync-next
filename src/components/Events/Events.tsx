@@ -284,60 +284,34 @@ const Events = () => {
             <div className="flex gap-2 overflow-x-auto scrollbar-hide">
               <PrefetchLink
                 to="/dashboard"
-                className="relative flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:scale-105 active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #374151 0%, #1f2937 100%)',
-                  color: 'white',
-                  boxShadow: '0 2px 8px rgba(55, 65, 81, 0.3)',
-                }}
+                className="relative flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:opacity-80 active:scale-95 border border-neutral-300 dark:border-neutral-600 text-theme-color"
               >
                 <Home className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 <span>Home</span>
               </PrefetchLink>
               <button
-                className="flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all"
-                style={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  color: 'white',
-                  boxShadow: '0 2px 8px rgba(102, 126, 234, 0.5)',
-                  transform: 'scale(1.05)',
-                }}
+                className="flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all bg-black text-white dark:bg-white dark:text-black"
               >
                 <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 <span>Events</span>
               </button>
               <PrefetchLink
                 to="/marketplace"
-                className="relative flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:scale-105 active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-                  color: 'white',
-                  boxShadow: '0 2px 8px rgba(245, 87, 108, 0.3)',
-                }}
+                className="relative flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:opacity-80 active:scale-95 border border-neutral-300 dark:border-neutral-600 text-theme-color"
               >
                 <ShoppingBag className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 <span>Marketplace</span>
               </PrefetchLink>
               <PrefetchLink
                 to="/confessions"
-                className="relative flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:scale-105 active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-                  color: 'white',
-                  boxShadow: '0 2px 8px rgba(79, 172, 254, 0.3)',
-                }}
+                className="relative flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:opacity-80 active:scale-95 border border-neutral-300 dark:border-neutral-600 text-theme-color"
               >
                 <MessageSquare className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 <span>Confessions</span>
               </PrefetchLink>
               <button
                 onClick={() => router.push('/upload-story')}
-                className="flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:scale-105 active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-                  color: 'white',
-                  boxShadow: '0 2px 8px rgba(250, 112, 154, 0.3)',
-                }}
+                className="flex items-center gap-1.5 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition-all hover:opacity-80 active:scale-95 border border-neutral-300 dark:border-neutral-600 text-theme-color"
               >
                 <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" />
                 <span>Add Story</span>
