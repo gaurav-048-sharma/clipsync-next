@@ -534,7 +534,7 @@ const InstagramMessages = () => {
         </div>
       )}
 
-      <div className="flex-1 md:ml-64 flex flex-col md:flex-row h-full overflow-hidden">
+      <div className="flex-1 md:ml-64 flex flex-col md:flex-row h-full overflow-hidden relative">
         {/* ───── Conversations Sidebar ───── */}
         <div
           className={`w-full md:w-[320px] lg:w-[397px] border-r border-theme-color bg-theme-background flex flex-col transition-transform duration-300 ease-in-out h-full max-h-screen ${
@@ -720,7 +720,7 @@ const InstagramMessages = () => {
         {/* ───── Chat Window ───── */}
         {selectedConversation ? (
           <div
-            className={`flex flex-col fixed md:relative inset-0 md:inset-auto md:flex-1 md:h-full bg-theme-background overflow-hidden z-[60] ${
+            className={`flex flex-col absolute md:relative inset-0 md:inset-auto md:flex-1 md:h-full bg-theme-background overflow-hidden z-[60] ${
               selectedConversation
                 ? 'translate-x-0'
                 : 'translate-x-full md:translate-x-0'
