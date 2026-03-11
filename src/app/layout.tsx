@@ -9,9 +9,60 @@ import { Toaster } from '@/components/ui/toaster';
 
 const inter = Inter({ subsets: ['latin'] });
 
+const siteUrl = 'https://clipsync.vercel.app';
+
 export const metadata: Metadata = {
-  title: 'ClipSync',
-  description: 'Connect with your college community',
+  title: {
+    default: 'ClipSync – Connect with Your College Community',
+    template: '%s | ClipSync',
+  },
+  description:
+    'ClipSync is a college social platform to share posts, reels, stories, messages, confessions, events, and marketplace listings with your campus community.',
+  keywords: [
+    'clipsync',
+    'college social network',
+    'campus community',
+    'college events',
+    'college marketplace',
+    'college confessions',
+    'student social media',
+  ],
+  authors: [{ name: 'ClipSync' }],
+  creator: 'ClipSync',
+  metadataBase: new URL(siteUrl),
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: siteUrl,
+    siteName: 'ClipSync',
+    title: 'ClipSync – Connect with Your College Community',
+    description:
+      'Share posts, reels, stories, messages, confessions, events, and marketplace listings with your campus community.',
+    images: [{ url: '/logo.svg', width: 512, height: 512, alt: 'ClipSync Logo' }],
+  },
+  twitter: {
+    card: 'summary',
+    title: 'ClipSync – Connect with Your College Community',
+    description:
+      'Share posts, reels, stories, messages, confessions, events, and marketplace listings with your campus community.',
+    images: ['/logo.svg'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    // Replace with your actual Google Search Console verification code
+    // google: 'your-google-site-verification-code',
+  },
 };
 
 export default function RootLayout({
@@ -21,6 +72,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+      </head>
       <body className={inter.className}>
         <ReduxProvider>
           <ThemeProvider>
